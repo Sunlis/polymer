@@ -16,6 +16,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../polymer.html">
   <link rel="import" href="bind-elements.html">
 <body>
+  <template id="class-repeat" is="dom-repeat" items='["class1", "class2"]'>
+    <div class$=[[item]] clazz$="[[item]]">[[item]]</div>
+  </template>
 <script>
 
 suite('single-element binding effects', function() {
@@ -286,6 +289,13 @@ suite('single-element binding effects', function() {
     assert.equal(el.$.boundWithDash.textContent, 'yes');
   });
 
+  test('class attribute without template scope not erased', function() {
+    var el = document.querySelector('.class1');
+    assert.notEqual(el, null, 'class without template scope is undefined');
+    var el2 = document.querySelector('.class2');
+    assert.notEqual(el2, null, 'class without template scope is undefined');
+  });
+
 });
 
 </script>
@@ -381,6 +391,18 @@ suite('computed bindings with dynamic functions', function() {
 
     assert.equal(called, 1);
     assert.equal(el.computedValue, 'translated: Hello');
+
+  });
+
+  test('ensure annotator can pass dynamic fn to parent props', function(done) {
+    el = document.createElement('x-child-template-with-dynamic-fn');
+    document.body.appendChild(el);
+
+    setTimeout(function() {
+      var check = Polymer.dom(el.root).querySelector('p');
+      assert.equal(check.textContent, 'text');
+      done();
+    });
 
   });
 
