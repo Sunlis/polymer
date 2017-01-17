@@ -869,6 +869,20 @@ suite('binding corner cases', function() {
     assert.isTrue(el._isAttachedChanged.calledOnce);
     document.body.removeChild(el);
   });
+
+  test('do not override property when going downwards', function() {
+    var value = 5, value_set_again = false, targetObj = {
+      get value () {
+        return value;
+      },
+      set value (v) {
+        value = v;
+        value_set_again = true;
+      }
+    };
+    Polymer.Bind._modelApi.__setProperty('value', 5, false, targetObj);
+    assert.isFalse(value_set_again);
+  });
 });
 
 suite('compound binding / string interpolation', function() {
@@ -1020,6 +1034,14 @@ suite('order of effects', function() {
     ];
 
     assert.deepEqual(el.invocations, expected);
+  });
+});
+
+suite('value propagation', function() {
+  test('effects forward propagate value', function() {
+    var el = document.createElement('x-propagate');
+    document.body.appendChild(el);
+    assert.equal(el.value, 1, 'observers did not receive latest value for property');
   });
 });
 
